@@ -1,7 +1,7 @@
 [package]
-name = "rust-counter-tutorial"
+name = "near-voting-system"
 version = "0.1.0"
-authors = ["NEAR Inc <hello@near.org>"]
+authors = ["0xBarro"]
 edition = "2018"
 
 [lib]

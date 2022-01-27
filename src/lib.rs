@@ -69,6 +69,7 @@ mod tests {
         // instantiate a contract variable with the counter at zero
         let mut contract = Voting::default(); 
         assert_eq!(contract.i, 0);   
+        assert_eq!(contract.contract_owner, "alice.testnet");   
         contract.inc();
         assert_eq!(contract.i, 5);
     }

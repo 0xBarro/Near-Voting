@@ -7,12 +7,13 @@ near_sdk::setup_alloc!();
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
 pub struct Voting {
-    pub i: usize
+    pub i: usize,
+    pub contract_owner: String,
 }
 
 #[near_bindgen]
 impl Voting {
-    pub fn log(&mut self) {
+    pub fn inc(&mut self) {
         let log_str = format!("Signer Account Id {}", env::signer_account_id());
         self.i = 5;
         env::log(log_str.as_bytes());
@@ -21,7 +22,8 @@ impl Voting {
 
 impl Default for Voting {
     fn default() -> Voting {
-        Voting {i: 0}
+        let co = env::current_account_id();
+        Voting {i: 0, contract_owner: co}
     }
 }   
 
@@ -67,7 +69,7 @@ mod tests {
         // instantiate a contract variable with the counter at zero
         let mut contract = Voting::default(); 
         assert_eq!(contract.i, 0);   
-        contract.log();
+        contract.inc();
         assert_eq!(contract.i, 5);
     }
 }

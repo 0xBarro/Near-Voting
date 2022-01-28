@@ -8,9 +8,7 @@ get_sandbox:
 	git clone https://github.com/near/nearcore && cd nearcore && make sandbox
 
 sandbox: 
+	rm -rf nearcore/target/temp/
+	rm -rf /tmp/near-sandbox/
 	nearcore/target/debug/neard-sandbox --home /tmp/near-sandbox init
 	nearcore/target/debug/neard-sandbox --home /tmp/near-sandbox run
-
-clean_sandbox: 
-	rm -rf nearcore/target/temp/near-sandbox
-

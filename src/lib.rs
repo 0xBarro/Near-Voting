@@ -13,17 +13,24 @@ pub struct Voting {
 
 #[near_bindgen]
 impl Voting {
-    pub fn inc(&mut self) {
-        let log_str = format!("Signer Account Id {}", env::signer_account_id());
-        self.i = 5;
+    pub fn inc_value(&mut self) {
+        let log_str = format!("Signer Account Id {} Incremented the Value", env::signer_account_id());
+        self.i += 1;
         env::log(log_str.as_bytes());
+    }
+
+    pub fn reset_value(&mut self) {
+        assert!(env::predecessor_account_id() == self.contract_owner, 
+        "Only the owner {} can call the method, not {}", self.contract_owner, env::predecessor_account_id()
+    );
+        env::log(b"Reseting Counter");
+        self.i = 0
     }
 }
 
 impl Default for Voting {
     fn default() -> Voting {
-        let co = env::current_account_id();
-        Voting {i: 0, contract_owner: co}
+        Voting {i: 0, contract_owner: env::current_account_id()}
     }
 }   
 
@@ -34,7 +41,7 @@ mod tests {
     use super::*;
     use near_sdk::MockedBlockchain;
     use near_sdk::{testing_env, VMContext};
-
+    
     // part of writing unit tests is setting up a mock context
     // in this example, this is only needed for env::log in the contract
     // this is also a useful list to peek at when wondering what's available in env::*
@@ -70,7 +77,21 @@ mod tests {
         let mut contract = Voting::default(); 
         assert_eq!(contract.i, 0);   
         assert_eq!(contract.contract_owner, "alice.testnet");   
-        contract.inc();
-        assert_eq!(contract.i, 5);
+        contract.inc_value();
+        assert_eq!(contract.i, 1);
+        contract.inc_value();
+        assert_eq!(contract.i, 2);
+    }
+
+    #[test]
+    #[should_panic]
+    fn reset_counter() {
+        let context = get_context(vec![], false);
+        testing_env!(context);
+        let mut contract = Voting::default();
+
+        contract.inc_value();
+        contract.reset_value();
+
     }
 }

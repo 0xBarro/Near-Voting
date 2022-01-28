@@ -45,12 +45,12 @@ mod tests {
     // part of writing unit tests is setting up a mock context
     // in this example, this is only needed for env::log in the contract
     // this is also a useful list to peek at when wondering what's available in env::*
-    fn get_context(input: Vec<u8>, is_view: bool) -> VMContext {
+    fn get_context(input: Vec<u8>, is_view: bool, current_account_id: String, signer_account_id: String, predecessor_account_id: String) -> VMContext {
         VMContext {
-            current_account_id: "alice.testnet".to_string(),
-            signer_account_id: "robert.testnet".to_string(),
+            current_account_id,
+            signer_account_id,
             signer_account_pk: vec![0, 1, 2],
-            predecessor_account_id: "jane.testnet".to_string(),
+            predecessor_account_id,
             input,
             block_index: 0,
             block_timestamp: 0,
@@ -66,15 +66,23 @@ mod tests {
         }
     }
 
+    fn before_test(current_account_id: &str, signer_account_id: &str, predecessor_account_id: &str) {
+        // set up the mock context into the testing environment
+        let context = get_context(vec![],
+            false,
+            current_account_id.to_string(),
+            signer_account_id.to_string(),
+            predecessor_account_id.to_string());
+        testing_env!(context);
+    }
+
     // mark individual unit tests with #[test] for them to be registered and fired
     #[test]
     fn increment() {
-        // set up the mock context into the testing environment
-        let context = get_context(vec![], false);
-        testing_env!(context);
 
-        // instantiate a contract variable with the counter at zero
-        let mut contract = Voting::default(); 
+        before_test("alice.testnet", "bob.testnet", "greg.testnet");
+        let mut contract = Voting::default();
+
         assert_eq!(contract.i, 0);   
         assert_eq!(contract.contract_owner, "alice.testnet");   
         contract.inc_value();
@@ -85,13 +93,18 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn reset_counter() {
-        let context = get_context(vec![], false);
-        testing_env!(context);
+    fn reset_counter_panic() {
+        before_test("alice.testnet", "bob.testnet", "greg.testnet");
         let mut contract = Voting::default();
-
         contract.inc_value();
         contract.reset_value();
+    }
 
+    #[test]
+    fn reset_counter() {
+        before_test("alice.testnet", "alice.testnet", "alice.testnet");
+        let mut contract = Voting::default();
+        contract.inc_value();
+        contract.reset_value();
     }
 }

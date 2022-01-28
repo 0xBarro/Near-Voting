@@ -1,5 +1,5 @@
 [package]
-name = "near-voting-system"
+name = "voting"
 version = "0.1.0"
 authors = ["0xBarro"]
 edition = "2018"

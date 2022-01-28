@@ -26,10 +26,14 @@ impl Voting {
         env::log(b"Reseting Counter");
         self.i = 0
     }
+
+    pub fn show_value(&self) -> usize {
+        self.i
+    }
 }
 
 impl Default for Voting {
-    fn default() -> Voting {
+    fn default() -> Voting {    
         Voting {i: 0, contract_owner: env::current_account_id()}
     }
 }   

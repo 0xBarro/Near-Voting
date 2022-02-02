@@ -1,4 +1,6 @@
+use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 
+#[derive(std::fmt::Debug, BorshDeserialize, BorshSerialize)]
 pub struct Gift {
     url: String,
     n_tokens_required: usize,
@@ -16,6 +18,7 @@ impl Gift {
     pub fn n_tokens_needed(&self) -> usize {self.n_tokens_required - self.current_tokens}
 
     pub fn send_tokens(&mut self, n_tokens: usize) {
+        // Validation for this is made on the frontend
         if n_tokens > self.n_tokens_needed() {
             panic!("Number of tokens sent are higher than the required amount") 
         } else {

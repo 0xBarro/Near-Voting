@@ -48,7 +48,16 @@ impl Voting {
     pub fn contribute_to_gift(&mut self, account_name: &str, gift_url: &str) {
         let amount_given = env::attached_deposit();
         let donator_account = env::current_account_id();
-        println!("Thank you for giving me {}, {}", amount_given, donator_account);
+
+        if amount_given == 0 {
+            env::log(b"Please send some money!");
+            println!("Thank you for giving me {}, {}", amount_given, donator_account);
+        } else {
+            let gifts = self.get_gifts(account_name).unwrap();
+            let mut gift = gifts.get(&gift_url.to_string()).unwrap();
+            gift.send_tokens(amount_given as usize);
+        }
+        
     }
 
 }
@@ -113,7 +122,7 @@ mod tests {
         let mut contract = Voting::default();  
         let gift1_url = "test1.com";
 
-        contract.add_gift(gift1_url, 10);
+        contract.add_gift(gift1_url, 50);
         assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap().get_url(), gift1_url);
 
         // Pay contract

@@ -1,6 +1,6 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::{env, near_bindgen};
-use near_sdk::collections::{LookupMap, Vector};
+use near_sdk::collections::{LookupMap, UnorderedMap};
 
 near_sdk::setup_alloc!();
 
@@ -10,7 +10,7 @@ use gift::Gift;
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
 pub struct Voting { // TODO: Rename this class
-    gifts: LookupMap<String, Vector<Gift>>,
+    gifts: LookupMap<String, UnorderedMap<String, Gift>>,
     contract_owner: String,
 }
 
@@ -20,29 +20,33 @@ impl Default for Voting {
     }
 }
 
+#[near_bindgen]
 impl Voting {
     pub fn add_gift(&mut self, url: &str, n_tokens_needed: usize) {
         // Check if the address already has a list of gifts
         let method_caller_account = env::current_account_id();
         let new_gift = Gift::new(url, n_tokens_needed);
         match self.get_gifts(&method_caller_account) {
-            Some(mut v) => {
-                v.push(&new_gift);
-                self.gifts.insert(&method_caller_account, &v);
+            Some(mut map) => {
+                map.insert(&url.to_string(), &new_gift);
+                self.gifts.insert(&method_caller_account, &map);
             },
             None =>  {
                 // Create Vector
-                let mut vec: Vector<Gift> = Vector::new(b"g");
-                vec.push(&new_gift);
-                self.gifts.insert(&method_caller_account, &vec);       
+                let mut map: UnorderedMap<String, Gift> = UnorderedMap::new(b"g");
+                map.insert(&url.to_string(), &new_gift);
+                self.gifts.insert(&method_caller_account, &map);       
             },
         };
-
-        
     }
 
-    pub fn get_gifts(&self, account_name: &str) -> Option<Vector<Gift>> {
+    pub fn get_gifts(&self, account_name: &str) -> Option<UnorderedMap<String, Gift>> {
         return self.gifts.get(&account_name.to_string());
+    }
+
+    #[payable]
+    pub fn contribute_to_gift(&mut self, account_name: &str, gift_url: &str) {
+
     }
 
 }
@@ -66,7 +70,7 @@ mod tests {
             input: vec![],
             block_index: 0,
             block_timestamp: 0,
-            account_balance: 0,
+            account_balance: 100,
             account_locked_balance: 0,
             storage_usage,
             attached_deposit: 0,
@@ -85,10 +89,15 @@ mod tests {
         testing_env!(context);    
 
         let mut contract = Voting::default();  
-        contract.add_gift("test.com", 10);
-        assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().len(), 1);
+        let gift1_url = "test1.com";
+        let gift2_url = "test2.com";
 
-        contract.add_gift("test1.com", 10);
+        contract.add_gift(gift1_url, 10);
+        assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap().get_url(), gift1_url);
+
+        contract.add_gift(gift2_url, 20);
+        assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift2_url.to_string()).unwrap().get_url(), gift2_url);
+
         assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().len(), 2);
     }
 }

@@ -25,6 +25,10 @@ impl Gift {
             self.current_tokens += n_tokens
         }
     }
+
+    pub fn get_url(&self) -> String {
+        self.url.to_string()
+    }
 }
 
 // use the attribute below for unit tests

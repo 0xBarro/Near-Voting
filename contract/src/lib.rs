@@ -25,21 +25,26 @@ impl Voting {
         // Check if the address already has a list of gifts
         let method_caller_account = env::current_account_id();
         let new_gift = Gift::new(url, n_tokens_needed);
-        match self.gifts.get(&method_caller_account) {
-            Some(mut v) => v.push(&new_gift),
+        match self.get_gifts(&method_caller_account) {
+            Some(mut v) => {
+                v.push(&new_gift);
+                self.gifts.insert(&method_caller_account, &v);
+            },
             None =>  {
                 // Create Vector
                 let mut vec: Vector<Gift> = Vector::new(b"g");
                 vec.push(&new_gift);
-                self.gifts.insert(&method_caller_account, &vec);        
+                self.gifts.insert(&method_caller_account, &vec);       
             },
         };
-        println!("{}, {:?}",method_caller_account, self.get_gifts(&method_caller_account).unwrap());
+
+        
     }
 
     pub fn get_gifts(&self, account_name: &str) -> Option<Vector<Gift>> {
         return self.gifts.get(&account_name.to_string());
     }
+
 }
 
 // use the attribute below for unit tests
@@ -81,7 +86,9 @@ mod tests {
 
         let mut contract = Voting::default();  
         contract.add_gift("test.com", 10);
+        assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().len(), 1);
 
-        assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().len(), 1)
+        contract.add_gift("test1.com", 10);
+        assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().len(), 2);
     }
 }

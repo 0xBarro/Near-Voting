@@ -125,10 +125,14 @@ mod tests {
         contract.add_gift(gift1_url, 50);
         assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap().get_url(), gift1_url);
 
+        let gift = contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap();
+        assert_eq!(gift.n_tokens_needed(), 50);
+
         // Pay contract
         let context = get_context("ben.testnet".to_string(), "ben.testnet".to_string(), 0, 20);              
         testing_env!(context);    
         contract.contribute_to_gift(&caller_account.to_string(), gift1_url);
+        assert_eq!(gift.n_tokens_needed(), 30)
 
     }
 

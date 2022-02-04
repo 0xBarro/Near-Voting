@@ -4,7 +4,7 @@ use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 pub struct Gift {
     url: String,
     n_tokens_required: usize,
-    current_tokens: usize,
+    current_tokens: usize,  // WIll be incremented
 }
 
 impl Gift {

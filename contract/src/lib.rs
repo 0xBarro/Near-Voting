@@ -16,7 +16,7 @@ pub struct Voting { // TODO: Rename this class
 
 impl Default for Voting {
     fn default() -> Self {
-        Voting {gifts: LookupMap::new(b"s"), contract_owner: env::current_account_id()}
+        Voting {gifts: LookupMap::new(b"a"), contract_owner: env::current_account_id()}
     }
 }
 
@@ -26,38 +26,38 @@ impl Voting {
         // Check if the address already has a list of gifts
         let method_caller_account = env::current_account_id();
         let new_gift = Gift::new(url, n_tokens_needed);
-        match self.get_gifts(&method_caller_account) {
+
+        match self.gifts.get(&method_caller_account) {
             Some(mut map) => {
                 map.insert(&url.to_string(), &new_gift);
                 self.gifts.insert(&method_caller_account, &map);
             },
             None =>  {
                 // Create Vector
-                let mut map: UnorderedMap<String, Gift> = UnorderedMap::new(b"g");
+                let mut map: UnorderedMap<String, Gift> = UnorderedMap::new(url.as_bytes());
                 map.insert(&url.to_string(), &new_gift);
                 self.gifts.insert(&method_caller_account, &map);       
             },
         };
     }
 
-    pub fn get_gifts(&self, account_name: &str) -> Option<UnorderedMap<String, Gift>> {
-        return self.gifts.get(&account_name.to_string());
-    }
-
     #[payable]
     pub fn contribute_to_gift(&mut self, account_name: &str, gift_url: &str) {
         let amount_given = env::attached_deposit();
+        assert_eq!(amount_given > 0, true);
+
         let donator_account = env::current_account_id();
 
-        if amount_given == 0 {
-            env::log(b"Please send some money!");
-            println!("Thank you for giving me {}, {}", amount_given, donator_account);
-        } else {
-            let gifts = self.get_gifts(account_name).unwrap();
-            let mut gift = gifts.get(&gift_url.to_string()).unwrap();
-            gift.send_tokens(amount_given as usize);
-        }
-        
+        println!("Thank you for giving me {}, {}", amount_given, donator_account);
+        let mut gifts: UnorderedMap<String, Gift> = self.gifts.get(&account_name.to_string()).unwrap();
+        let mut gift: Gift = gifts.get(&gift_url.to_string()).unwrap();
+
+        println!("BEFORE INC: {:?}", gift);
+        gift.send_tokens(amount_given as usize);
+        println!("AFTER INC: {:?}", gift);
+
+        gifts.insert(&gift_url.to_string(), &gift);
+        self.gifts.insert(&account_name.to_string(), &gifts);
     }
 
 }
@@ -128,10 +128,11 @@ mod tests {
         let gift = contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap();
         assert_eq!(gift.n_tokens_needed(), 50);
 
-        // Pay contract
+        // // Pay contract
         let context = get_context("ben.testnet".to_string(), "ben.testnet".to_string(), 0, 20);              
         testing_env!(context);    
         contract.contribute_to_gift(&caller_account.to_string(), gift1_url);
+        let gift = contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap();
         assert_eq!(gift.n_tokens_needed(), 30)
 
     }

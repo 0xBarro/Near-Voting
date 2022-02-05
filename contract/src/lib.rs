@@ -14,22 +14,22 @@ pub struct Voting { // TODO: Rename this class
     contract_owner: String,
 }
 
+
 impl Default for Voting {
     fn default() -> Self {
         Voting {gifts: LookupMap::new(b"a"), contract_owner: env::current_account_id()}
     }
 }
 
-#[near_bindgen]
 impl Voting {
-    pub fn add_gift(&mut self, url: &str, n_tokens_needed: usize) {
+    pub fn add_gift(&mut self, url: String, n_tokens_needed: usize) {
         // Check if the address already has a list of gifts
         let method_caller_account = env::current_account_id();
-        let new_gift = Gift::new(url, n_tokens_needed);
+        let new_gift = Gift::new(&url, n_tokens_needed);
 
         match self.gifts.get(&method_caller_account) {
             Some(mut map) => {
-                map.insert(&url.to_string(), &new_gift);
+                map.insert(&url, &new_gift);
                 self.gifts.insert(&method_caller_account, &map);
             },
             None =>  {
@@ -41,24 +41,28 @@ impl Voting {
         };
     }
 
-    #[payable]
-    pub fn contribute_to_gift(&mut self, account_name: &str, gift_url: &str) {
-        let amount_given = env::attached_deposit();
-        assert_eq!(amount_given > 0, true);
-
-        let donator_account = env::current_account_id();
-
-        println!("Thank you for giving me {}, {}", amount_given, donator_account);
-        let mut gifts: UnorderedMap<String, Gift> = self.gifts.get(&account_name.to_string()).unwrap();
-        let mut gift: Gift = gifts.get(&gift_url.to_string()).unwrap();
-
-        println!("BEFORE INC: {:?}", gift);
-        gift.send_tokens(amount_given as usize);
-        println!("AFTER INC: {:?}", gift);
-
-        gifts.insert(&gift_url.to_string(), &gift);
-        self.gifts.insert(&account_name.to_string(), &gifts);
+    pub fn get_account_gifts(&self, account_name: String) -> UnorderedMap<String, Gift> {
+        self.gifts.get(&account_name).unwrap()
     }
+
+    // #[payable]
+    // pub fn contribute_to_gift(&mut self, account_name: String, gift_url: String) {
+    //     let amount_given = env::attached_deposit();
+    //     assert_eq!(amount_given > 0, true);
+
+    //     let donator_account = env::current_account_id();
+
+    //     println!("Thank you for giving me {}, {}", amount_given, donator_account);
+    //     let mut gifts: UnorderedMap<String, Gift> = self.gifts.get(&account_name.to_string()).unwrap();
+    //     let mut gift: Gift = gifts.get(&gift_url.to_string()).unwrap();
+
+    //     println!("BEFORE INC: {:?}", gift);
+    //     gift.send_tokens(amount_given as usize);
+    //     println!("AFTER INC: {:?}", gift);
+
+    //     gifts.insert(&gift_url.to_string(), &gift);
+    //     self.gifts.insert(&account_name.to_string(), &gifts);
+    // }
 
 }
 
@@ -103,10 +107,10 @@ mod tests {
         let gift1_url = "test1.com";
         let gift2_url = "test2.com";
 
-        contract.add_gift(gift1_url, 10);
+        contract.add_gift(gift1_url.to_string(), 10);
         assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap().get_url(), gift1_url);
 
-        contract.add_gift(gift2_url, 20);
+        contract.add_gift(gift2_url.to_string(), 20);
         assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift2_url.to_string()).unwrap().get_url(), gift2_url);
 
         assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().len(), 2);
@@ -122,18 +126,18 @@ mod tests {
         let mut contract = Voting::default();  
         let gift1_url = "test1.com";
 
-        contract.add_gift(gift1_url, 50);
+        contract.add_gift(gift1_url.to_string(), 50);
         assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap().get_url(), gift1_url);
 
         let gift = contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap();
         assert_eq!(gift.n_tokens_needed(), 50);
 
         // // Pay contract
-        let context = get_context("ben.testnet".to_string(), "ben.testnet".to_string(), 0, 20);              
-        testing_env!(context);    
-        contract.contribute_to_gift(&caller_account.to_string(), gift1_url);
-        let gift = contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap();
-        assert_eq!(gift.n_tokens_needed(), 30)
+        // let context = get_context("ben.testnet".to_string(), "ben.testnet".to_string(), 0, 20);              
+        // testing_env!(context);    
+        // contract.contribute_to_gift(caller_account.to_string(), gift1_url.to_string());
+        // let gift = contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap();
+        // assert_eq!(gift.n_tokens_needed(), 30)
 
     }
 

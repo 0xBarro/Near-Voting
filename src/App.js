@@ -22,6 +22,7 @@ export default function App() {
       <button className={(mode === "My Gifts") ? 'selected-button' : ""} onClick={() => setMode('My Gifts')}>My Gifts</button>
       <button className={(mode === "Add Gifts") ? 'selected-button' : ""} onClick={() => setMode('Add Gifts')}>Add Gifts</button>
       <button className={(mode === "Contribute Gifts") ? 'selected-button' : ""} onClick={() => setMode('Contribute Gifts')}>Contribute Gifts</button>
+      <button className={(mode === "About") ? 'selected-button' : ""} onClick={() => setMode('About')}>About</button>
       <button className='salmon-bg' onClick={() => logout()}> Log Out</button>
     </div>
 
@@ -30,6 +31,10 @@ export default function App() {
     {(mode === 'My Gifts') && <GiftsList account={window.accountId}></GiftsList>}
     {(mode === 'Add Gifts') && <AddGiftPane></AddGiftPane>}
     {(mode === 'Contribute Gifts') && <ContributeGiftPane></ContributeGiftPane>}
+    {(mode === 'About') && <div>
+      <p> This app allows anyone to list gifts they want and contribute to others peoples gifts.</p>
+      </div>
+      }
 
   </main  >
 }

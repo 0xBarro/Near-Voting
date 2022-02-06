@@ -1,6 +1,13 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { getGifts } from "./utils";
+import './global.css'
+
+const Gift = props => {
+    return <div className="gift">
+        URL: {props.url} - Needed Tokens: {props.n_tokens_required}
+    </div>
+}
 
 export const GiftsList = props => {
     const [giftsList, setGitfsList] = useState();
@@ -13,5 +20,6 @@ export const GiftsList = props => {
 
     return <div>
         <h3>  My gifts list  </h3>
+        {(giftsList !== undefined) && giftsList.map(g => <Gift {...g}></Gift>)}
     </div>
 }

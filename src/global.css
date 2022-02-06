@@ -196,3 +196,15 @@ aside footer *:last-child {
 .selected-button {
   background-color: skyblue;
 }
+
+.gift {
+  display: flex;
+  background-color: #aaa;
+  border-radius: 10px;
+  margin: 2px;
+  padding: 2px;
+}
+
+.gift:hover {
+  background-color: #444;
+}

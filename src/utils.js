@@ -37,3 +37,10 @@ export function login() {
   // the private key in localStorage.
   window.walletConnection.requestSignIn(nearConfig.contractName)
 }
+
+export const getGifts = accountId => {
+  console.log('Getting gifts for account: ' + accountId)
+  const gifts  = contract.get_account_gifts();
+  console.log(gifts)
+  return gifts
+}

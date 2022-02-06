@@ -1,7 +1,8 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
+use serde::{Serialize, Deserialize};
 
 
-#[derive(std::fmt::Debug, BorshDeserialize, BorshSerialize)]
+#[derive(std::fmt::Debug, Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
 pub struct Gift {
     url: String,
     n_tokens_required: usize,

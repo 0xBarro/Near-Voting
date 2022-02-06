@@ -21,6 +21,7 @@ impl Default for Voting {
     }
 }
 
+#[near_bindgen]
 impl Voting {
     pub fn add_gift(&mut self, url: String, n_tokens_needed: usize) {
         // Check if the address already has a list of gifts
@@ -41,8 +42,8 @@ impl Voting {
         };
     }
 
-    pub fn get_account_gifts(&self, account_name: String) -> UnorderedMap<String, Gift> {
-        self.gifts.get(&account_name).unwrap()
+    pub fn get_account_gifts(&self, account_id: String) -> UnorderedMap<String, Gift> {
+        self.gifts.get(&account_id).unwrap()
     }
 
     // #[payable]

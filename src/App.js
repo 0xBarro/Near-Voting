@@ -4,6 +4,7 @@ import { logout } from './utils'
 import { LoginPane } from './Login'
 import { ContributeGiftPane } from './ContributeGIftPane'
 import { AddGiftPane } from './AddGiftPane'
+import { GiftsList } from './GiftsList'
 import './global.css'
 
 import getConfig from './config'
@@ -26,6 +27,7 @@ export default function App() {
 
     <h3> Logged in as {window.accountId}</h3>
 
+    {(mode === 'My Gifts') && <GiftsList account={window.accountId}></GiftsList>}
     {(mode === 'Add Gifts') && <AddGiftPane></AddGiftPane>}
     {(mode === 'Contribute Gifts') && <ContributeGiftPane></ContributeGiftPane>}
 

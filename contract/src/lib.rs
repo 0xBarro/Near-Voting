@@ -46,24 +46,24 @@ impl Voting {
         self.gifts.get(&account_id).unwrap().values().collect()
     }
 
-    // #[payable]
-    // pub fn contribute_to_gift(&mut self, account_name: String, gift_url: String) {
-    //     let amount_given = env::attached_deposit();
-    //     assert_eq!(amount_given > 0, true);
+    #[payable]
+    pub fn contribute_to_gift(&mut self, account_name: String, gift_url: String) {
+        let amount_given = env::attached_deposit();
+        assert_eq!(amount_given > 0, true);
 
-    //     let donator_account = env::current_account_id();
+        let donator_account = env::current_account_id();
 
-    //     println!("Thank you for giving me {}, {}", amount_given, donator_account);
-    //     let mut gifts: UnorderedMap<String, Gift> = self.gifts.get(&account_name.to_string()).unwrap();
-    //     let mut gift: Gift = gifts.get(&gift_url.to_string()).unwrap();
+        println!("Thank you for giving me {}, {}", amount_given, donator_account);
+        let mut gifts: UnorderedMap<String, Gift> = self.gifts.get(&account_name.to_string()).unwrap();
+        let mut gift: Gift = gifts.get(&gift_url.to_string()).unwrap();
 
-    //     println!("BEFORE INC: {:?}", gift);
-    //     gift.send_tokens(amount_given as usize);
-    //     println!("AFTER INC: {:?}", gift);
+        println!("BEFORE INC: {:?}", gift);
+        gift.send_tokens(amount_given as usize);
+        println!("AFTER INC: {:?}", gift);
 
-    //     gifts.insert(&gift_url.to_string(), &gift);
-    //     self.gifts.insert(&account_name.to_string(), &gifts);
-    // }
+        gifts.insert(&gift_url.to_string(), &gift);
+        self.gifts.insert(&account_name.to_string(), &gifts);
+    }
 
 }
 

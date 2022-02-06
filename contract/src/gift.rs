@@ -21,8 +21,7 @@ impl Gift {
 
     pub fn send_tokens(&mut self, n_tokens: usize) {
         // Validation for this is made on the frontend
-        if n_tokens > self.n_tokens_needed() {
-            panic!("Number of tokens sent are higher than the required amount") 
+        if n_tokens > self.n_tokens_needed() { panic!("Number of tokens sent are higher than the required amount. Sent: {}", n_tokens) 
         } else {
             self.current_tokens += n_tokens
         }

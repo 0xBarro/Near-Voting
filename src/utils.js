@@ -1,5 +1,6 @@
 import { connect, Contract, keyStores, WalletConnection } from 'near-api-js'
 import getConfig from './config'
+import { utils } from 'near-api-js'
 
 const nearConfig = getConfig(process.env.NODE_ENV || 'development')
 
@@ -20,7 +21,7 @@ export async function initContract() {
     // View methods are read only. They don't modify the state, but usually return some value.
     viewMethods: ['get_account_gifts'],
     // Change methods can modify the state. But you don't receive the returned value when called.
-    changeMethods: ['add_gift'],
+    changeMethods: ['add_gift', 'contribute_to_gift'],
   })
 }
 
@@ -41,11 +42,19 @@ export function login() {
 export const getGifts = accountId => {
   console.log('Getting gifts for account: ' + accountId)
   const gifts  = contract.get_account_gifts({account_id: accountId}).catch(e => e);
-  console.log(gifts)
   return gifts
 }
 
 export const insertGift = inputsObj => {
   console.log("Saving gift ", inputsObj)
   contract.add_gift(inputsObj);
+}
+
+
+export const contribute_to_gift = (accountId, giftUrl, amount) => {
+  const scaledAmount = utils.format.parseNearAmount(amount); 
+  console.log("Sending: ", scaledAmount)
+  const res = contract.contribute_to_gift({account_name: accountId, gift_url: giftUrl}, 30_000_000_000_000, scaledAmount)
+
+  console.log(res);
 }

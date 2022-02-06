@@ -5,7 +5,6 @@ export const SelectAccount = props => {
 
     const onChangeHandler = (v) => {
         const value = v.target.value;
-        console.log(value);
         setAccount(value);
     }
 

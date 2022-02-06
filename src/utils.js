@@ -40,7 +40,12 @@ export function login() {
 
 export const getGifts = accountId => {
   console.log('Getting gifts for account: ' + accountId)
-  const gifts  = contract.get_account_gifts();
+  const gifts  = contract.get_account_gifts({account_id: accountId}).catch(e => undefined);
   console.log(gifts)
   return gifts
+}
+
+export const insertGift = inputsObj => {
+  console.log("Saving gift ", inputsObj)
+  contract.add_gift(inputsObj);
 }

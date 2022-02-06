@@ -23,10 +23,10 @@ impl Default for Voting {
 
 #[near_bindgen]
 impl Voting {
-    pub fn add_gift(&mut self, url: String, n_tokens_needed: usize) {
+    pub fn add_gift(&mut self, url: String, n_tokens_needed: String) {
         // Check if the address already has a list of gifts
         let method_caller_account = env::current_account_id();
-        let new_gift = Gift::new(&url, n_tokens_needed);
+        let new_gift = Gift::new(&url, n_tokens_needed.parse().unwrap());
 
         match self.gifts.get(&method_caller_account) {
             Some(mut map) => {
@@ -42,8 +42,8 @@ impl Voting {
         };
     }
 
-    pub fn get_account_gifts(&self, account_id: String) -> UnorderedMap<String, Gift> {
-        self.gifts.get(&account_id).unwrap()
+    pub fn get_account_gifts(&self, account_id: String) -> Vec<Gift> {
+        self.gifts.get(&account_id).unwrap().values().collect()
     }
 
     // #[payable]
@@ -108,10 +108,10 @@ mod tests {
         let gift1_url = "test1.com";
         let gift2_url = "test2.com";
 
-        contract.add_gift(gift1_url.to_string(), 10);
+        contract.add_gift(gift1_url.to_string(), "10".to_string());
         assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap().get_url(), gift1_url);
 
-        contract.add_gift(gift2_url.to_string(), 20);
+        contract.add_gift(gift2_url.to_string(), "20".to_string());
         assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift2_url.to_string()).unwrap().get_url(), gift2_url);
 
         assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().len(), 2);
@@ -127,7 +127,7 @@ mod tests {
         let mut contract = Voting::default();  
         let gift1_url = "test1.com";
 
-        contract.add_gift(gift1_url.to_string(), 50);
+        contract.add_gift(gift1_url.to_string(), "50".to_string());
         assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap().get_url(), gift1_url);
 
         let gift = contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap();

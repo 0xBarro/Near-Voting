@@ -23,9 +23,9 @@ impl Default for Voting {
 
 #[near_bindgen]
 impl Voting {
-    pub fn add_gift(&mut self, url: String, n_tokens_needed: String) {
+    pub fn add_gift(&mut self, url: String, n_tokens_needed: String) -> String {
         // Check if the address already has a list of gifts
-        let method_caller_account = env::current_account_id();
+        let method_caller_account = env::signer_account_id();
         let new_gift = Gift::new(&url, n_tokens_needed.parse().unwrap());
 
         match self.gifts.get(&method_caller_account) {
@@ -40,6 +40,8 @@ impl Voting {
                 self.gifts.insert(&method_caller_account, &map);       
             },
         };
+
+        method_caller_account
     }
 
     pub fn get_account_gifts(&self, account_id: String) -> Vec<Gift> {
@@ -80,7 +82,7 @@ mod tests {
     fn get_context(current_account_id: String, predecessor_account_id: String, storage_usage: u64, attached_deposit: u128) -> VMContext {
         VMContext {
             current_account_id,
-            signer_account_id: "jane.testnet".to_string(),
+            signer_account_id: "signer.testnet".to_string(),
             signer_account_pk: vec![0, 1, 2],
             predecessor_account_id,
             input: vec![],
@@ -101,7 +103,7 @@ mod tests {
     #[test]
     fn add_gift() {
         let caller_account = "alice.testnet";
-        let context = get_context(caller_account.to_string(), caller_account.to_string(), 0, 0);              
+        let context = get_context(caller_account.to_string(), "Pred".to_string(), 0, 0);              
         testing_env!(context);    
 
         let mut contract = Voting::default();  
@@ -109,12 +111,15 @@ mod tests {
         let gift2_url = "test2.com";
 
         contract.add_gift(gift1_url.to_string(), "10".to_string());
-        assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap().get_url(), gift1_url);
+        assert_eq!(contract.gifts.get(&"signer.testnet".to_string()).unwrap().get(&gift1_url.to_string()).unwrap().get_url(), gift1_url);
 
         contract.add_gift(gift2_url.to_string(), "20".to_string());
-        assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift2_url.to_string()).unwrap().get_url(), gift2_url);
+        assert_eq!(contract.gifts.get(&"signer.testnet".to_string()).unwrap().get(&gift2_url.to_string()).unwrap().get_url(), gift2_url);
 
-        assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().len(), 2);
+        assert_eq!(contract.gifts.get(&"signer.testnet".to_string()).unwrap().len(), 2);
+
+        let gifts: Vec<Gift> = contract.get_account_gifts("signer.testnet".to_string());
+        assert_eq!(gifts.len(), 2);
     }
 
     #[test]
@@ -128,9 +133,9 @@ mod tests {
         let gift1_url = "test1.com";
 
         contract.add_gift(gift1_url.to_string(), "50".to_string());
-        assert_eq!(contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap().get_url(), gift1_url);
+        assert_eq!(contract.gifts.get(&"signer.testnet".to_string()).unwrap().get(&gift1_url.to_string()).unwrap().get_url(), gift1_url);
 
-        let gift = contract.gifts.get(&caller_account.to_string()).unwrap().get(&gift1_url.to_string()).unwrap();
+        let gift = contract.gifts.get(&"signer.testnet".to_string()).unwrap().get(&gift1_url.to_string()).unwrap();
         assert_eq!(gift.n_tokens_needed(), 50);
 
         // // Pay contract

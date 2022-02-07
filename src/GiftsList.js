@@ -4,8 +4,10 @@ import { getGifts, contribute_to_gift } from "./utils";
 import './global.css'
 
 export const Gift = props => {
-    return <div className="gift" onClick={() => contribute_to_gift(props.account, props.url, "10")}>
-        <a key={props.key} href={props.url}>URL</a> - Needed Tokens: {props.n_tokens_required} - Given: {props.current_tokens}
+    const [val, setVal] = useState(0)
+    return <div className="gift">
+        <a key={props.key} href={props.url}>URL</a> - Needed Tokens: {props.n_tokens_required} - Given: {props.current_tokens}<br></br> 
+        <input type='number' min={0} onChange={(v) => setVal(v.target.value)}></input> <button onClick={v => contribute_to_gift(props.account, props.url, val)}> Contribute </button>
     </div>
 }
 

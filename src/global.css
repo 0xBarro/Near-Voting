@@ -198,11 +198,10 @@ aside footer *:last-child {
 }
 
 .gift {
-  display: flex;
   background-color: #aaa;
   border-radius: 10px;
   margin: 2px;
-  padding: 2px;
+  padding: 10px;
 }
 
 .gift:hover {

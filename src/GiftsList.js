@@ -21,7 +21,7 @@ export const GiftsList = props => {
     }, [])
 
     return <div>
-        <h3>  My gifts list  </h3>
+        <h3>  My Wishlist list  </h3>
         {(giftsList !== undefined) && giftsList.map(g => <Gift key={props.url} {...g} account={props.account}></Gift>)}
     </div>
 }

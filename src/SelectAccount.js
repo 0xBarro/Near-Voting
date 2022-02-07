@@ -9,7 +9,7 @@ export const SelectAccount = props => {
     }
 
     return <div>
-        <h1>Please select an account to view gifts</h1>
+        <h1>Please select an account to view the wishlist.</h1>
         <input type="text" onChange={onChangeHandler}></input>
         <button onClick={() => props.setAccount(account)}>Submit</button>
     </div>

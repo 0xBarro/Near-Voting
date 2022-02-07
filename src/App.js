@@ -32,7 +32,7 @@ export default function App() {
     {(mode === 'Add Item') && <AddGiftPane></AddGiftPane>}
     {(mode === 'Contribute') && <ContributeGiftPane></ContributeGiftPane>}
     {(mode === 'About') && <div>
-      <p> This app allows anyone to list gifts they want and contribute to others peoples gifts.</p>
+      <p> This app allows the users to create a wishlist of online shopping items. Users can then get contributions and contribute to other's wishlists. </p>
       </div>
       }
 

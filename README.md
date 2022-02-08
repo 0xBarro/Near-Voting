@@ -1,10 +1,9 @@
 # Defi Wishlist 
-This app allows to create a wishlist of items you want, and then contribute to other peoples gifts and receive contributions. 
-
-The app is hosted here:
+This app allows to create a wishlist, and then contribute to other peoples gifts and receive contributions. 
 
 # Usage
 To use the app it is first necessary to login with a near wallet.
+
 There are 4 Tabs on the page, each described below. 
 
 ### My Wishlist 
@@ -23,3 +22,10 @@ Short description of the app functionality
 Logs out of the wallet.
 
 
+# Running the app 
+To run the app use
+
+```sh
+npm install
+npm run dev
+```
